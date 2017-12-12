@@ -13,6 +13,10 @@
 using namespace std;
 
 
+
+/*
+ * Function converts integer value to string
+*/
 string int_to_str(int number)
     {
     std::string s = std::to_string(number);
@@ -20,12 +24,18 @@ string int_to_str(int number)
     }
 
 
+/*
+ * Function convert string to integer
+*/
 int str_to_int(string number)
     {    
     return std::stoi( number );
     }
 
 
+/*
+ * Function check if directory exists or not
+*/
 bool directory_exists( const char* pzPath )
     {
     if ( pzPath == NULL) return false;
@@ -40,11 +50,13 @@ bool directory_exists( const char* pzPath )
         bExists = true;    
         (void) closedir (pDir);
 	}
-
     return bExists;
     }
 
 
+/*
+ * Function check if file exists or not
+*/
 bool is_file_exist(const char *fileName)
     {
     std::ifstream infile(fileName);
@@ -52,12 +64,14 @@ bool is_file_exist(const char *fileName)
     }
 
 
-
+/*
+ * Function get .logtail directory
+ * This directory is each for every user - because every one can see different part of file
+*/
 string get_logtail_dir()
     {
     struct passwd *pw = getpwuid(getuid());
-    const char *homedir = pw->pw_dir;
-    
+    const char *homedir = pw->pw_dir;    
     const char *logtail_dir_name = "/.logtail/";
     
     char * dir = new char[strlen(homedir) + strlen(logtail_dir_name) + 1];
@@ -68,7 +82,6 @@ string get_logtail_dir()
 	{
 	mkdir(dir, S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
 	}
-
     return dir;
     }
 
@@ -108,8 +121,10 @@ int read_number_from_file(string filename)
     
     string dir_str = get_logtail_dir();
     char * dir = new char[dir_str.length() + 1];
+    
     strcpy(dir, dir_str.c_str());
     char * file_path = new char[strlen(dir) + strlen(p_filename) + 1];
+    
     strcpy(file_path,dir);
     strcat(file_path, p_filename);
 
@@ -120,7 +135,6 @@ int read_number_from_file(string filename)
 	std::ifstream input( file_path );
 	getline( input, line );
 	}
-    
     return str_to_int(line);
     }
 
@@ -130,7 +144,7 @@ int read_number_from_file(string filename)
 */
 bool parse_file(char * file)
     {
-    // our result
+    // our result - default is true, it can be changed only when someone will rewrite file
     bool res = true;
     // starting from the begining of file
     int num = 0;
@@ -147,7 +161,6 @@ bool parse_file(char * file)
 	    cout << line << endl;
 	    }
 	}
-
     /*
      * This is the case when someone has overwriten our file
      * and now we have to parse him from begining
@@ -183,6 +196,12 @@ bool help(string main_name)
     return true;
     }
 
+
+/*
+ * Default main()
+ * It gets command line params, and do the job
+ * It will do it twice, when someone will overwrite log file
+ */
 int main(int argc, char* argv[])
     {
     if (argc < 2)
@@ -201,7 +220,6 @@ int main(int argc, char* argv[])
 	*/
 	parse_file(argv[1]);
 	}
-
     return 0;
     }
 
