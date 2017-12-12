@@ -1,3 +1,15 @@
+/*************************************************************************************
+*
+*
+*    logtail - A tool for displaying incremental file content
+*    version: 1.1
+*    update date: 2017-12-12
+*    author: Marek Urbanski (marek@www2.pl)
+*
+*
+*************************************************************************************/*
+
+
 #include <iostream>
 #include <sstream>
 #include <string>
@@ -9,6 +21,7 @@
 #include <dirent.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <algorithm>
 
 using namespace std;
 
@@ -21,6 +34,30 @@ string int_to_str(int number)
     {
     std::string s = std::to_string(number);
     return s;
+    }
+
+/*
+ * This function replace file path
+ * it will store the name as variable name - file name in .logtail directory
+*/
+string replace_file_path(string path)
+    {
+    std::replace( path.begin(), path.end(), '/', '_');
+    std::replace( path.begin(), path.end(), ' ', '_');
+
+    return path;
+    }
+
+/*
+ * the same as previous one but for pointer to char
+*/
+char * replace_file_path_pointer(char* path)
+    {
+    string s_path = replace_file_path(path);
+    char * p_path = new char[s_path.length() + 1];
+    strcpy(p_path, s_path.c_str());
+
+    return p_path;
     }
 
 
@@ -91,8 +128,9 @@ string get_logtail_dir()
  * Write to file what was the last position in file
  * this will be taken next time we will display this file
 */
-bool write_to_file(char * filename, char * num_lines)
+bool write_to_file(char * p_filename, char * num_lines)
     {
+    char * filename = replace_file_path_pointer(p_filename);
     string dir_str = get_logtail_dir();
     char * dir = new char[dir_str.length() + 1];
     strcpy(dir, dir_str.c_str());
@@ -116,6 +154,8 @@ bool write_to_file(char * filename, char * num_lines)
 */
 int read_number_from_file(string filename)
     {
+    filename = replace_file_path(filename);
+    
     char * p_filename = new char[filename.length() + 1];
     strcpy(p_filename, filename.c_str());
     
@@ -185,7 +225,7 @@ bool help(string main_name)
     {
     cout << endl;
     cout << endl;
-    cout << " logtail v.1.0" << endl;
+    cout << " logtail v.1.1" << endl;
     cout << "----------------------------------------------" << endl;
     cout << "Usage: " << main_name << " {file_name}" << endl;
     cout << endl;
